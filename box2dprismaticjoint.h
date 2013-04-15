@@ -31,7 +31,7 @@
 
 class b2World;
 class b2PrismaticJoint;
-class b2PrismaticJointDef;
+struct b2PrismaticJointDef;
 
 class Box2DPrismaticJoint : public Box2DJoint
 {

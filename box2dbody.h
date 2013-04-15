@@ -31,7 +31,7 @@
 #ifndef BOX2DBODY_H
 #define BOX2DBODY_H
 
-#include <QDeclarativeItem>
+#include <QQuickItem>
 
 class Box2DFixture;
 class Box2DWorld;
@@ -42,7 +42,7 @@ class b2World;
 /**
  * The Box2D body, build up from a list of shapes.
  */
-class Box2DBody : public QDeclarativeItem
+class Box2DBody : public QQuickItem
 {
     Q_OBJECT
 
@@ -55,7 +55,7 @@ class Box2DBody : public QDeclarativeItem
     Q_PROPERTY(bool fixedRotation READ fixedRotation WRITE setFixedRotation NOTIFY fixedRotationChanged)
     Q_PROPERTY(bool active READ active WRITE setActive)
     Q_PROPERTY(QPointF linearVelocity READ linearVelocity WRITE setLinearVelocity NOTIFY linearVelocityChanged)
-    Q_PROPERTY(QDeclarativeListProperty<Box2DFixture> fixtures READ fixtures)
+    Q_PROPERTY(QQmlListProperty<Box2DFixture> fixtures READ fixtures)
 
 public:
     enum BodyType {
@@ -64,7 +64,7 @@ public:
         Dynamic
     };
 
-    explicit Box2DBody(QDeclarativeItem *parent = 0);
+    explicit Box2DBody(QQuickItem *parent = 0);
     ~Box2DBody();
 
     qreal linearDamping() const { return mLinearDamping; }
@@ -91,7 +91,7 @@ public:
     QPointF linearVelocity() const { return mLinearVelocity; }
     void setLinearVelocity(const QPointF &linearVelocity);
 
-    QDeclarativeListProperty<Box2DFixture> fixtures();
+    QQmlListProperty<Box2DFixture> fixtures();
 
     void initialize(b2World *world);
     void synchronize();
@@ -123,7 +123,7 @@ private slots:
     void onRotationChanged();
 
 private:
-    static void append_fixture(QDeclarativeListProperty<Box2DFixture> *list,
+	static void append_fixture(QQmlListProperty<Box2DFixture> *list,
                                Box2DFixture *fixture);
 
     b2Body *mBody;

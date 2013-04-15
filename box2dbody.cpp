@@ -36,8 +36,8 @@
 
 #include <cmath>
 
-Box2DBody::Box2DBody(QDeclarativeItem *parent) :
-    QDeclarativeItem(parent),
+Box2DBody::Box2DBody(QQuickItem *parent) :
+    QQuickItem(parent),
     mBody(0),
     mWorld(0),
     mLinearDamping(0.0f),
@@ -147,13 +147,12 @@ void Box2DBody::setLinearVelocity(const QPointF &linearVelocity)
     emit linearVelocityChanged();
 }
 
-QDeclarativeListProperty<Box2DFixture> Box2DBody::fixtures()
+QQmlListProperty<Box2DFixture> Box2DBody::fixtures()
 {
-    return QDeclarativeListProperty<Box2DFixture>(this, 0,
-                                                  &Box2DBody::append_fixture);
+    return QQmlListProperty<Box2DFixture>(this, 0, &Box2DBody::append_fixture, 0, 0, 0);
 }
 
-void Box2DBody::append_fixture(QDeclarativeListProperty<Box2DFixture> *list,
+void Box2DBody::append_fixture(QQmlListProperty<Box2DFixture> *list,
                                Box2DFixture *fixture)
 {
     Box2DBody *body = static_cast<Box2DBody*>(list->object);
@@ -209,7 +208,7 @@ void Box2DBody::synchronize()
 
     // Do fuzzy comparisions to avoid small inaccuracies causing repaints
     if (!qFuzzyCompare(x(), newX) || !qFuzzyCompare(y(), newY))
-        setPos(newX, newY);
+        setPosition(QPointF(newX, newY));
     if (!qFuzzyCompare(rotation(), newRotation))
         setRotation(newRotation);
 
@@ -229,7 +228,7 @@ void Box2DBody::cleanup(b2World *world)
 
 void Box2DBody::componentComplete()
 {
-    QDeclarativeItem::componentComplete();
+    QQuickItem::componentComplete();
 
     if (mInitializePending)
         initialize(mWorld);
@@ -252,7 +251,7 @@ void Box2DBody::geometryChanged(const QRectF &newGeometry,
         }
     }
 
-    QDeclarativeItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
 void Box2DBody::onRotationChanged()

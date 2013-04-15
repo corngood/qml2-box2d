@@ -31,8 +31,8 @@
 
 #include <QDebug>
 
-Box2DFixture::Box2DFixture(QDeclarativeItem *parent) :
-    QDeclarativeItem(parent),
+Box2DFixture::Box2DFixture(QQuickItem *parent) :
+    QQuickItem(parent),
     mFixtureDef(),
     mFixture(0)
 {
