@@ -56,7 +56,7 @@ Box2DBody::Box2DBody(QQuickItem *parent) :
 
 Box2DBody::~Box2DBody()
 {
-    cleanup(mWorld);
+    cleanup();
 }
 
 void Box2DBody::setLinearDamping(qreal linearDamping)
@@ -219,9 +219,9 @@ void Box2DBody::synchronize()
     mSynchronizing = false;
 }
 
-void Box2DBody::cleanup(b2World *world)
+void Box2DBody::cleanup()
 {
-    world->DestroyBody(mBody);
+    if(mBody) mWorld->DestroyBody(mBody);
     mBody = 0;
     mWorld = 0;
 }

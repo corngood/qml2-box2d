@@ -95,7 +95,7 @@ public:
 
     void initialize(b2World *world);
     void synchronize();
-    void cleanup(b2World *world);
+    void cleanup();
 
     Q_INVOKABLE void applyLinearImpulse(const QPointF &impulse,
                                         const QPointF &point);
