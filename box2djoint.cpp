@@ -29,12 +29,17 @@
 
 Box2DJoint::Box2DJoint(QObject *parent) :
     QObject(parent),
-    mInitializePending(false),
     mWorld(0),
     mCollideConnected(false),
     mBodyA(0),
-    mBodyB(0)
+    mBodyB(0),
+    mJoint(0)
 {
+}
+
+Box2DJoint::~Box2DJoint()
+{
+    cleanup();
 }
 
 bool Box2DJoint::collideConnected() const
@@ -107,20 +112,32 @@ void Box2DJoint::setBodyB(Box2DBody *bodyB)
 
 void Box2DJoint::initialize()
 {
+    cleanup();
+
     if (!mBodyA || !mBodyB || !mWorld) {
         // When components are created dynamically, they get their parent
         // assigned before they have been completely initialized. In that case
         // we need to delay initialization.
-        mInitializePending = true;
         return;
     }
 
-    createJoint();
+    mJointWorld = mWorld->world();
+    mJoint = createJoint(mJointWorld);
+    mJoint->SetUserData(this);
 }
 
-b2World *Box2DJoint::world() const
+void Box2DJoint::nullifyJoint()
 {
-    return mWorld->world();
+    mJoint = 0;
+}
+
+void Box2DJoint::cleanup()
+{
+    if (mJoint) {
+        mJoint->SetUserData(0);
+        mJointWorld->DestroyJoint(mJoint);
+        mJoint = 0;
+    }
 }
 
 void Box2DJoint::bodyACreated()

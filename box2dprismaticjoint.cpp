@@ -30,14 +30,8 @@
 
 Box2DPrismaticJoint::Box2DPrismaticJoint(QObject *parent) :
     Box2DJoint(parent),
-    mPrismaticJointDef(),
-    mPrismaticJoint(0)
+    mPrismaticJointDef()
 {
-}
-
-Box2DPrismaticJoint::~Box2DPrismaticJoint()
-{
-    cleanup(world());
 }
 
 float Box2DPrismaticJoint::lowerTranslation() const
@@ -51,8 +45,8 @@ void Box2DPrismaticJoint::setLowerTranslation(float lowerTranslation)
         return;
 
     mPrismaticJointDef.lowerTranslation = lowerTranslation;
-    if (mPrismaticJoint)
-        mPrismaticJoint->SetLimits(lowerTranslation,
+    if (joint())
+        joint()->SetLimits(lowerTranslation,
                                    mPrismaticJointDef.upperTranslation);
     emit lowerTranslationChanged();
 }
@@ -68,8 +62,8 @@ void Box2DPrismaticJoint::setUpperTranslation(float upperTranslation)
         return;
 
     mPrismaticJointDef.upperTranslation = upperTranslation;
-    if (mPrismaticJoint)
-        mPrismaticJoint->SetLimits(mPrismaticJointDef.lowerTranslation,
+    if (joint())
+        joint()->SetLimits(mPrismaticJointDef.lowerTranslation,
                                    upperTranslation);
     emit upperTranslationChanged();
 }
@@ -85,8 +79,8 @@ void Box2DPrismaticJoint::setMaxMotorForce(float maxMotorForce)
         return;
 
     mPrismaticJointDef.maxMotorForce = maxMotorForce;
-    if (mPrismaticJoint)
-        mPrismaticJoint->SetMaxMotorForce(maxMotorForce);
+    if (joint())
+        joint()->SetMaxMotorForce(maxMotorForce);
     emit maxMotorForceChanged();
 }
 
@@ -101,8 +95,8 @@ void Box2DPrismaticJoint::setMotorSpeed(float motorSpeed)
         return;
 
     mPrismaticJointDef.motorSpeed = motorSpeed;
-    if (mPrismaticJoint)
-        mPrismaticJoint->SetMotorSpeed(motorSpeed);
+    if (joint())
+        joint()->SetMotorSpeed(motorSpeed);
     emit motorSpeedChanged();
 }
 
@@ -117,8 +111,8 @@ void Box2DPrismaticJoint::setEnableLimit(bool enableLimit)
         return;
 
     mPrismaticJointDef.enableLimit = enableLimit;
-    if (mPrismaticJoint)
-        mPrismaticJoint->EnableLimit(enableLimit);
+    if (joint())
+        joint()->EnableLimit(enableLimit);
     emit enableLimitChanged();
 }
 
@@ -133,8 +127,8 @@ void Box2DPrismaticJoint::setEnableMotor(bool enableMotor)
         return;
 
     mPrismaticJointDef.enableMotor = enableMotor;
-    if (mPrismaticJoint)
-        mPrismaticJoint->EnableMotor(enableMotor);
+    if (joint())
+        joint()->EnableMotor(enableMotor);
     emit enableMotorChanged();
 }
 
@@ -154,29 +148,12 @@ void Box2DPrismaticJoint::setAxis(const QPointF &axis)
     emit axisChanged();
 }
 
-void Box2DPrismaticJoint::nullifyJoint()
-{
-    mPrismaticJoint = 0;
-}
-
-void Box2DPrismaticJoint::createJoint()
+b2Joint *Box2DPrismaticJoint::createJoint(b2World *world)
 {
     mPrismaticJointDef.Initialize(bodyA()->body(), bodyB()->body(),
                                  bodyA()->body()->GetWorldCenter(),
                                   mPrismaticJointDef.localAxisA);
     mPrismaticJointDef.collideConnected = collideConnected();
 
-    mPrismaticJoint = static_cast<b2PrismaticJoint*>
-            (world()->CreateJoint(&mPrismaticJointDef));
-    mPrismaticJoint->SetUserData(this);
-    mInitializePending = false;
-}
-
-void Box2DPrismaticJoint::cleanup(b2World *world)
-{
-    if (mPrismaticJoint && bodyA() && bodyB()) {
-        mPrismaticJoint->SetUserData(0);
-        world->DestroyJoint(mPrismaticJoint);
-        mPrismaticJoint = 0;
-    }
+    return world->CreateJoint(&mPrismaticJointDef);
 }

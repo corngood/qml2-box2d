@@ -32,14 +32,8 @@
 Box2DRevoluteJoint::Box2DRevoluteJoint(QObject *parent) :
     Box2DJoint(parent),
     mRevoluteJointDef(),
-    mRevoluteJoint(0),
     mOverrideLocalAnchorA(false)
 {
-}
-
-Box2DRevoluteJoint::~Box2DRevoluteJoint()
-{
-    cleanup(world());
 }
 
 float Box2DRevoluteJoint::lowerAngle() const
@@ -53,8 +47,8 @@ void Box2DRevoluteJoint::setLowerAngle(float lowerAngle)
         return;
 
     mRevoluteJointDef.lowerAngle = lowerAngle * b2_pi;
-    if (mRevoluteJoint)
-        mRevoluteJoint->SetLimits(lowerAngle * b2_pi,
+    if (joint())
+        joint()->SetLimits(lowerAngle * b2_pi,
                                   mRevoluteJointDef.upperAngle);
     emit lowerAngleChanged();
 }
@@ -70,8 +64,8 @@ void Box2DRevoluteJoint::setUpperAngle(float upperAngle)
         return;
 
     mRevoluteJointDef.upperAngle = upperAngle * b2_pi;
-    if (mRevoluteJoint)
-        mRevoluteJoint->SetLimits(mRevoluteJointDef.lowerAngle,
+    if (joint())
+        joint()->SetLimits(mRevoluteJointDef.lowerAngle,
                                   upperAngle * b2_pi);
     emit upperAngleChanged();
 }
@@ -87,8 +81,8 @@ void Box2DRevoluteJoint::setMaxMotorTorque(float maxMotorTorque)
         return;
 
     mRevoluteJointDef.maxMotorTorque = maxMotorTorque;
-    if (mRevoluteJoint)
-        mRevoluteJoint->SetMaxMotorTorque(maxMotorTorque);
+    if (joint())
+        joint()->SetMaxMotorTorque(maxMotorTorque);
     emit maxMotorTorqueChanged();
 }
 
@@ -103,8 +97,8 @@ void Box2DRevoluteJoint::setMotorSpeed(float motorSpeed)
         return;
 
     mRevoluteJointDef.motorSpeed = motorSpeed;
-    if (mRevoluteJoint)
-        mRevoluteJoint->SetMotorSpeed(motorSpeed);
+    if (joint())
+        joint()->SetMotorSpeed(motorSpeed);
     emit motorSpeedChanged();
 }
 
@@ -119,8 +113,8 @@ void Box2DRevoluteJoint::setEnableLimit(bool enableLimit)
         return;
 
     mRevoluteJointDef.enableLimit = enableLimit;
-    if (mRevoluteJoint)
-        mRevoluteJoint->EnableLimit(enableLimit);
+    if (joint())
+        joint()->EnableLimit(enableLimit);
     emit enableLimitChanged();
 }
 
@@ -135,8 +129,8 @@ void Box2DRevoluteJoint::setEnableMotor(bool enableMotor)
         return;
 
     mRevoluteJointDef.enableMotor = enableMotor;
-    if (mRevoluteJoint)
-        mRevoluteJoint->EnableMotor(enableMotor);
+    if (joint())
+        joint()->EnableMotor(enableMotor);
     emit enableMotorChanged();
 }
 
@@ -160,12 +154,7 @@ void Box2DRevoluteJoint::setLocalAnchorA(const QPointF &localAnchorA)
     emit localAnchorAChanged();
 }
 
-void Box2DRevoluteJoint::nullifyJoint()
-{
-    mRevoluteJoint = 0;
-}
-
-void Box2DRevoluteJoint::createJoint()
+b2Joint *Box2DRevoluteJoint::createJoint(b2World *world)
 {
     b2Vec2 anchor = mOverrideLocalAnchorA ?
                 b2Vec2(mLocalAnchorA.x() / scaleRatio,
@@ -177,17 +166,5 @@ void Box2DRevoluteJoint::createJoint()
                                  anchor);
     mRevoluteJointDef.collideConnected = collideConnected();
 
-    mRevoluteJoint = static_cast<b2RevoluteJoint*>(
-                world()->CreateJoint(&mRevoluteJointDef));
-    mRevoluteJoint->SetUserData(this);
-    mInitializePending = false;
-}
-
-void Box2DRevoluteJoint::cleanup(b2World *world)
-{
-    if (mRevoluteJoint && bodyA() && bodyB()) {
-        mRevoluteJoint->SetUserData(0);
-        world->DestroyJoint(mRevoluteJoint);
-        mRevoluteJoint = 0;
-    }
+    return world->CreateJoint(&mRevoluteJointDef);
 }

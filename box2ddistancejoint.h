@@ -45,7 +45,6 @@ class Box2DDistanceJoint : public Box2DJoint
 
 public:
     explicit Box2DDistanceJoint(QObject *parent = 0);
-    ~Box2DDistanceJoint();
 
     float length() const;
     void setLength(float length);
@@ -62,9 +61,11 @@ public:
     QPointF localAnchorB() const;
     void setLocalAnchorB(const QPointF &localAnchorB);
 
-    void nullifyJoint();
-    void createJoint();
-    void cleanup(b2World *world);
+protected:
+    b2Joint *createJoint(b2World *world);
+    b2DistanceJoint *joint() {
+        return static_cast<b2DistanceJoint*>(Box2DJoint::joint());
+    }
 
 signals:
     void lengthChanged();

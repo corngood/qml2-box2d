@@ -46,6 +46,7 @@ class Box2DJoint : public QObject
 
 public:
     explicit Box2DJoint(QObject *parent = 0);
+    virtual ~Box2DJoint();
 
     bool collideConnected() const;
     void setCollideConnected(bool collideConnected);
@@ -61,12 +62,12 @@ public:
 
     void initialize();
 
-    virtual void nullifyJoint() = 0;
-    virtual void cleanup(b2World *world) = 0;
+    virtual void nullifyJoint();
+    virtual void cleanup();
 
 protected:
-    virtual void createJoint() = 0;
-    b2World *world() const;
+    virtual b2Joint *createJoint(b2World *world) = 0;
+    b2Joint *joint();
 
 private slots:
     void bodyACreated();
@@ -79,13 +80,14 @@ signals:
     void bodyBChanged();
 
 protected:
-    bool mInitializePending;
 
 private:
     Box2DWorld *mWorld;
     bool mCollideConnected;
     Box2DBody *mBodyA;
     Box2DBody *mBodyB;
+    b2Joint *mJoint;
+    b2World *mJointWorld;
 };
 
 

@@ -48,7 +48,6 @@ class Box2DRevoluteJoint : public Box2DJoint
 
 public:
     explicit Box2DRevoluteJoint(QObject *parent = 0);
-    ~Box2DRevoluteJoint();
 
     float lowerAngle() const;
     void setLowerAngle(float lowerAngle);
@@ -71,9 +70,11 @@ public:
     QPointF localAnchorA() const;
     void setLocalAnchorA(const QPointF &localAnchorA);
 
-    void nullifyJoint();
-    void createJoint();
-    void cleanup(b2World *world);
+protected:
+    b2Joint *createJoint(b2World *world);
+    b2RevoluteJoint *joint() {
+        return static_cast<b2RevoluteJoint*>(Box2DJoint::joint());
+    }
 
 signals:
     void lowerAngleChanged();
@@ -86,7 +87,6 @@ signals:
 
 private:
     b2RevoluteJointDef mRevoluteJointDef;
-    b2RevoluteJoint *mRevoluteJoint;
     bool mOverrideLocalAnchorA;
     QPointF mLocalAnchorA;
 };

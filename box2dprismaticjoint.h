@@ -47,7 +47,6 @@ class Box2DPrismaticJoint : public Box2DJoint
 
 public:
     explicit Box2DPrismaticJoint(QObject *parent = 0);
-    ~Box2DPrismaticJoint();
 
     float lowerTranslation() const;
     void setLowerTranslation(float lowerTranslation);
@@ -70,9 +69,11 @@ public:
     QPointF axis() const;
     void setAxis(const QPointF &axis);
 
-    void nullifyJoint();
-    void createJoint();
-    void cleanup(b2World *world);
+protected:
+    b2Joint *createJoint(b2World *world);
+    b2PrismaticJoint *joint() {
+        return static_cast<b2PrismaticJoint*>(Box2DJoint::joint());
+    }
 
 signals:
     void lowerTranslationChanged();
@@ -87,7 +88,6 @@ signals:
 
 private:
     b2PrismaticJointDef mPrismaticJointDef;
-    b2PrismaticJoint *mPrismaticJoint;
 };
 
 #endif // BOX2DPRISMATICJOINT_H

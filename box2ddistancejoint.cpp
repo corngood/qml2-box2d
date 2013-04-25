@@ -39,11 +39,6 @@ Box2DDistanceJoint::Box2DDistanceJoint(QObject *parent) :
 {
 }
 
-Box2DDistanceJoint::~Box2DDistanceJoint()
-{
-    cleanup(world());
-}
-
 float Box2DDistanceJoint::length() const
 {
     return mOverrideAnchorLength ? mLength : mDistanceJointDef.length;
@@ -134,12 +129,7 @@ void Box2DDistanceJoint::setLocalAnchorB(const QPointF &localAnchorB)
     emit localAnchorBChanged();
 }
 
-void Box2DDistanceJoint::nullifyJoint()
-{
-    mDistanceJoint = 0;
-}
-
-void Box2DDistanceJoint::createJoint()
+b2Joint *Box2DDistanceJoint::createJoint(b2World *world)
 {
     b2Vec2 anchorA = mOverrideLocalAnchorA ?
                 b2Vec2(mLocalAnchorA.x() / scaleRatio,
@@ -159,16 +149,8 @@ void Box2DDistanceJoint::createJoint()
     if (mOverrideAnchorLength)
         mDistanceJointDef.length = mLength;
     mDistanceJoint = static_cast<b2DistanceJoint*>
-            (world()->CreateJoint(&mDistanceJointDef));
+            (world->CreateJoint(&mDistanceJointDef));
     mDistanceJoint->SetUserData(this);
-    mInitializePending = false;
-}
 
-void Box2DDistanceJoint::cleanup(b2World *world)
-{
-    if (mDistanceJoint && bodyA() && bodyB()) {
-        mDistanceJoint->SetUserData(0);
-        world->DestroyJoint(mDistanceJoint);
-        mDistanceJoint = 0;
-    }
+    return mDistanceJoint;
 }
