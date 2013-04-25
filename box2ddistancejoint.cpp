@@ -31,7 +31,6 @@
 Box2DDistanceJoint::Box2DDistanceJoint(QObject *parent) :
     Box2DJoint(parent),
     mDistanceJointDef(),
-    mDistanceJoint(0),
     mOverrideAnchorLength(false),
     mLength(0),
     mOverrideLocalAnchorA(false),
@@ -52,8 +51,8 @@ void Box2DDistanceJoint::setLength(float length)
     mOverrideAnchorLength = true;
     mLength = length / scaleRatio;
 
-    if (mDistanceJoint)
-        mDistanceJoint->SetLength(length / scaleRatio);
+    if (joint())
+        joint()->SetLength(length / scaleRatio);
     emit lengthChanged();
 }
 
@@ -68,8 +67,8 @@ void Box2DDistanceJoint::setFrequencyHz(float frequencyHz)
         return;
 
     mDistanceJointDef.frequencyHz = frequencyHz;
-    if (mDistanceJoint)
-        mDistanceJoint->SetFrequency(frequencyHz);
+    if (joint())
+        joint()->SetFrequency(frequencyHz);
     emit frequencyHzChanged();
 }
 
@@ -84,8 +83,8 @@ void Box2DDistanceJoint::setDampingRatio(float dampingRatio)
         return;
 
     mDistanceJointDef.dampingRatio = dampingRatio;
-    if (mDistanceJoint)
-        mDistanceJoint->SetDampingRatio(dampingRatio);
+    if (joint())
+        joint()->SetDampingRatio(dampingRatio);
     emit dampingRatioChanged();
 }
 
@@ -148,9 +147,5 @@ b2Joint *Box2DDistanceJoint::createJoint(b2World *world)
     mDistanceJointDef.collideConnected = collideConnected();
     if (mOverrideAnchorLength)
         mDistanceJointDef.length = mLength;
-    mDistanceJoint = static_cast<b2DistanceJoint*>
-            (world->CreateJoint(&mDistanceJointDef));
-    mDistanceJoint->SetUserData(this);
-
-    return mDistanceJoint;
+    return world->CreateJoint(&mDistanceJointDef);
 }

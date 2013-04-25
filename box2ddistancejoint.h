@@ -76,7 +76,6 @@ signals:
 
 private:
     b2DistanceJointDef mDistanceJointDef;
-    b2DistanceJoint *mDistanceJoint;
     bool mOverrideAnchorLength;
     float mLength;
     bool mOverrideLocalAnchorA;
