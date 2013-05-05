@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QPointF>
+#include <QPointer>
 #include <Box2D.h>
 
 class b2World;
@@ -82,7 +83,7 @@ signals:
 protected:
 
 private:
-    Box2DWorld *mWorld;
+    QPointer<Box2DWorld> mWorld;
     bool mCollideConnected;
     Box2DBody *mBodyA;
     Box2DBody *mBodyB;

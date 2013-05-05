@@ -133,7 +133,7 @@ void Box2DJoint::nullifyJoint()
 
 void Box2DJoint::cleanup()
 {
-    if (mJoint) {
+    if (mWorld && mJoint) {
         mJoint->SetUserData(0);
         mJointWorld->DestroyJoint(mJoint);
         mJoint = 0;

@@ -100,11 +100,6 @@ Box2DWorld::Box2DWorld(QQuickItem *parent) :
 
 Box2DWorld::~Box2DWorld()
 {
-    // Bodies must be deleted before the world
-    foreach (Box2DBody *body, mBodies)
-        body->cleanup();
-    mBodies.clear();
-
     delete mWorld;
     delete mContactListener;
     delete mDestructionListener;
@@ -148,34 +143,8 @@ void Box2DWorld::componentComplete()
     mWorld->SetContactListener(mContactListener);
     mWorld->SetDestructionListener(mDestructionListener);
 
-    foreach (QQuickItem *child, childItems())
-        if (Box2DBody *body = dynamic_cast<Box2DBody*>(child)) {
-            registerBody(body);
-            connect(body, SIGNAL(destroyed()), this, SLOT(unregisterBody()));
-        }
-
     if (mIsRunning)
         mTimer.start(mFrameTime, this);
-}
-
-/**
- * Registers a Box2D body with this world. When the world component is
- * complete, it will initialize the body.
- */
-void Box2DWorld::registerBody(Box2DBody *body)
-{
-    mBodies.append(body);
-    body->initialize(mWorld);
-}
-
-/**
- * Unregisters a Box2D body from this world. Called when a dynamically
- * created Box2D body has been deleted.
- */
-void Box2DWorld::unregisterBody()
-{
-    Box2DBody *body = static_cast<Box2DBody*>(sender());
-    mBodies.removeOne(body);
 }
 
 void Box2DWorld::fixtureDestroyed(Box2DFixture *fixture)
@@ -192,8 +161,7 @@ void Box2DWorld::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == mTimer.timerId()) {
         mWorld->Step(mTimeStep, mVelocityIterations, mPositionIterations);
-        foreach (Box2DBody *body, mBodies)
-            body->synchronize();
+        emit stepped();
 
         // Emit contact signals
         foreach (const ContactEvent &event, mContactListener->events()) {
@@ -221,25 +189,7 @@ void Box2DWorld::timerEvent(QTimerEvent *event)
 
             contact = contact->GetNext();
         }
-
-        emit stepped();
     }
 
     QQuickItem::timerEvent(event);
-}
-
-void Box2DWorld::itemChange(ItemChange change,
-                                const ItemChangeData &data)
-{
-    if (isComponentComplete()) {
-        if (change == ItemChildAddedChange) {
-            QQuickItem *child = data.item;
-            if (Box2DBody *body = dynamic_cast<Box2DBody*>(child)) {
-                registerBody(body);
-                connect(body, SIGNAL(destroyed()), this, SLOT(unregisterBody()));
-            }
-        }
-    }
-
-    QQuickItem::itemChange(change, data);
 }

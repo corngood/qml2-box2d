@@ -59,6 +59,22 @@ Box2DBody::~Box2DBody()
     cleanup();
 }
 
+Box2DWorld *Box2DBody::box2DWorld() const
+{
+    return mWorld;
+}
+
+void Box2DBody::setWorld(Box2DWorld *world)
+{
+    if (mWorld == world)
+        return;
+
+    cleanup();
+    mWorld = world;
+    emit worldChanged();
+    initialize(mWorld->world());
+}
+
 void Box2DBody::setLinearDamping(qreal linearDamping)
 {
     if (mLinearDamping == linearDamping)
@@ -162,8 +178,6 @@ void Box2DBody::append_fixture(QQmlListProperty<Box2DFixture> *list,
 
 void Box2DBody::initialize(b2World *world)
 {
-    mWorld = world;
-
     if (!isComponentComplete()) {
         // When components are created dynamically, they get their parent
         // assigned before they have been completely initialized. In that case
@@ -187,6 +201,8 @@ void Box2DBody::initialize(b2World *world)
 
     foreach (Box2DFixture *fixture, mFixtures)
         fixture->createFixture(mBody);
+
+    connect(mWorld, SIGNAL(stepped()), this, SLOT(synchronize()));
 
     emit bodyCreated();
 }
@@ -221,7 +237,10 @@ void Box2DBody::synchronize()
 
 void Box2DBody::cleanup()
 {
-    if(mBody) mWorld->DestroyBody(mBody);
+    if(mWorld && mBody) {
+        mWorld->world()->DestroyBody(mBody);
+        disconnect(mWorld, SIGNAL(stepped()), this, SLOT(synchronize()));
+    }
     mBody = 0;
     mWorld = 0;
 }
@@ -231,7 +250,7 @@ void Box2DBody::componentComplete()
     QQuickItem::componentComplete();
 
     if (mInitializePending)
-        initialize(mWorld);
+        initialize(mWorld->world());
 }
 
 b2Body *Box2DBody::body() const

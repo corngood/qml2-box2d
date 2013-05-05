@@ -32,6 +32,7 @@
 #define BOX2DBODY_H
 
 #include <QQuickItem>
+#include <QPointer>
 
 class Box2DFixture;
 class Box2DWorld;
@@ -47,6 +48,7 @@ class Box2DBody : public QQuickItem
     Q_OBJECT
 
     Q_ENUMS(BodyType)
+    Q_PROPERTY(Box2DWorld *world READ box2DWorld WRITE setWorld NOTIFY worldChanged)
     Q_PROPERTY(qreal linearDamping READ linearDamping WRITE setLinearDamping NOTIFY linearDampingChanged)
     Q_PROPERTY(qreal angularDamping READ angularDamping WRITE setAngularDamping NOTIFY angularDampingChanged)
     Q_PROPERTY(BodyType bodyType READ bodyType WRITE setBodyType NOTIFY bodyTypeChanged)
@@ -66,6 +68,9 @@ public:
 
     explicit Box2DBody(QQuickItem *parent = 0);
     ~Box2DBody();
+
+    Box2DWorld *box2DWorld() const;
+    void setWorld(Box2DWorld *world);
 
     qreal linearDamping() const { return mLinearDamping; }
     void setLinearDamping(qreal linearDamping);
@@ -94,7 +99,6 @@ public:
     QQmlListProperty<Box2DFixture> fixtures();
 
     void initialize(b2World *world);
-    void synchronize();
     void cleanup();
 
     Q_INVOKABLE void applyForce(const QPointF &force, const QPointF &point);
@@ -106,7 +110,6 @@ public:
     Q_INVOKABLE QVector2D toWorld(const QVector2D &vector) const;
     Q_INVOKABLE QPointF toWorld(const QPointF &point) const;
 
-
     void componentComplete();
 
     b2Body *body() const;
@@ -115,6 +118,7 @@ protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
 signals:
+    void worldChanged();
     void linearDampingChanged();
     void angularDampingChanged();
     void bodyTypeChanged();
@@ -126,13 +130,14 @@ signals:
 
 private slots:
     void onRotationChanged();
+    void synchronize();
 
 private:
 	static void append_fixture(QQmlListProperty<Box2DFixture> *list,
                                Box2DFixture *fixture);
 
     b2Body *mBody;
-    b2World *mWorld;
+    QPointer<Box2DWorld> mWorld;
     qreal mLinearDamping;
     qreal mAngularDamping;
     BodyType mBodyType;

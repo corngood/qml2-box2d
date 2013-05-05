@@ -104,12 +104,9 @@ public:
 
     void componentComplete();
 
-    void registerBody(Box2DBody *body);
-
     b2World *world() const { return mWorld; }
 
 private slots:
-    void unregisterBody();
     void fixtureDestroyed(Box2DFixture *fixture);
 
 signals:
@@ -119,7 +116,6 @@ signals:
 
 protected:
     void timerEvent(QTimerEvent *);
-    void itemChange(ItemChange, const ItemChangeData &);
 
 private:
     b2World *mWorld;
@@ -132,7 +128,6 @@ private:
     QPointF mGravity;
     bool mIsRunning;
     QBasicTimer mTimer;
-    QList<Box2DBody*> mBodies;
 };
 
 QML_DECLARE_TYPE(Box2DWorld)
