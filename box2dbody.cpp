@@ -262,14 +262,18 @@ void Box2DBody::onRotationChanged()
     }
 }
 
-void Box2DBody::applyLinearImpulse(const QPointF &impulse,
-                                   const QPointF &point)
+void Box2DBody::applyForce(const QPointF &force, const QPointF &point)
 {
     if (mBody) {
-        mBody->ApplyLinearImpulse(b2Vec2(impulse.x() / scaleRatio,
-                                         -impulse.y() / scaleRatio),
-                                  b2Vec2(point.x() / scaleRatio,
-                                         -point.y() / scaleRatio));
+        mBody->ApplyForce(b2Vec2(force.x() / scaleRatio, -force.y() / scaleRatio),
+                          b2Vec2(point.x() / scaleRatio, -point.y() / scaleRatio));
+    }
+}
+
+void Box2DBody::applyForceToCenter(const QVector2D &force)
+{
+    if (mBody) {
+        mBody->ApplyForceToCenter(b2Vec2(force.x() / scaleRatio, -force.y() / scaleRatio));
     }
 }
 
@@ -277,6 +281,20 @@ void Box2DBody::applyTorque(qreal torque)
 {
     if (mBody)
         mBody->ApplyTorque(torque);
+}
+
+void Box2DBody::applyLinearImpulse(const QPointF &impulse, const QPointF &point)
+{
+    if (mBody) {
+        mBody->ApplyLinearImpulse(b2Vec2(impulse.x() / scaleRatio, -impulse.y() / scaleRatio),
+                                  b2Vec2(point.x() / scaleRatio, -point.y() / scaleRatio));
+    }
+}
+
+void Box2DBody::applyAngularImpulse(qreal impulse)
+{
+    if (mBody)
+        mBody->ApplyAngularImpulse(impulse);
 }
 
 QPointF Box2DBody::getWorldCenter() const
@@ -288,4 +306,20 @@ QPointF Box2DBody::getWorldCenter() const
         worldCenter.setY(-center.y * scaleRatio);
     }
     return worldCenter;
+}
+
+QVector2D Box2DBody::toWorld(const QVector2D &vector) const {
+    if(mBody) {
+        b2Vec2 v = mBody->GetWorldVector(b2Vec2(vector.x() / scaleRatio, -vector.y() / scaleRatio));
+        return QVector2D(v.x * scaleRatio, -v.y * scaleRatio);
+    }
+    else return vector;
+}
+
+QPointF Box2DBody::toWorld(const QPointF &point) const {
+    if(mBody) {
+        b2Vec2 v = mBody->GetWorldPoint(b2Vec2(point.x() / scaleRatio, -point.y() / scaleRatio));
+        return QPointF(v.x * scaleRatio, -v.y * scaleRatio);
+    }
+    else return point;
 }

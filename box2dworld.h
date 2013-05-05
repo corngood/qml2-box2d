@@ -42,7 +42,7 @@ class b2World;
 
 // TODO: Maybe turn this into a property of the world, though it can't be
 // changed dynamically.
-static const float scaleRatio = 32.0f; // 32 pixels in one meter
+static const float scaleRatio = 1.0f; // 32 pixels in one meter
 
 /**
  * Wrapper class around a Box2D world.

@@ -97,10 +97,15 @@ public:
     void synchronize();
     void cleanup();
 
-    Q_INVOKABLE void applyLinearImpulse(const QPointF &impulse,
-                                        const QPointF &point);
+    Q_INVOKABLE void applyForce(const QPointF &force, const QPointF &point);
+    Q_INVOKABLE void applyForceToCenter(const QVector2D &force);
     Q_INVOKABLE void applyTorque(qreal torque);
+    Q_INVOKABLE void applyLinearImpulse(const QPointF &impulse, const QPointF &point);
+    Q_INVOKABLE void applyAngularImpulse(qreal impulse);
     Q_INVOKABLE QPointF getWorldCenter() const;
+    Q_INVOKABLE QVector2D toWorld(const QVector2D &vector) const;
+    Q_INVOKABLE QPointF toWorld(const QPointF &point) const;
+
 
     void componentComplete();
 
