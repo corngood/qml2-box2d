@@ -163,6 +163,17 @@ void Box2DBody::setLinearVelocity(const QPointF &linearVelocity)
     emit linearVelocityChanged();
 }
 
+void Box2DBody::setAngularVelocity(const qreal &angularVelocity)
+{
+    if (mAngularVelocity == angularVelocity)
+        return;
+
+    mAngularVelocity = angularVelocity;
+    if (mBody)
+        mBody->SetAngularVelocity(angularVelocity);
+    emit angularVelocityChanged();
+}
+
 QQmlListProperty<Box2DFixture> Box2DBody::fixtures()
 {
     return QQmlListProperty<Box2DFixture>(this, 0, &Box2DBody::append_fixture, 0, 0, 0);
@@ -231,6 +242,8 @@ void Box2DBody::synchronize()
     b2Vec2 linearVelocity = mBody->GetLinearVelocity();
     setLinearVelocity(QPointF(linearVelocity.x * scaleRatio,
                               -linearVelocity.y * scaleRatio));
+
+    setAngularVelocity(mBody->GetAngularVelocity());
 
     mSynchronizing = false;
 }
