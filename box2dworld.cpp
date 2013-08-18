@@ -96,6 +96,12 @@ Box2DWorld::Box2DWorld(QQuickItem *parent) :
 {
     connect(mDestructionListener, SIGNAL(fixtureDestroyed(Box2DFixture*)),
             this, SLOT(fixtureDestroyed(Box2DFixture*)));
+
+    const b2Vec2 gravity(mGravity.x(), mGravity.y());
+
+    mWorld = new b2World(gravity);
+    mWorld->SetContactListener(mContactListener);
+    mWorld->SetDestructionListener(mDestructionListener);
 }
 
 Box2DWorld::~Box2DWorld()
@@ -136,12 +142,6 @@ void Box2DWorld::setGravity(const QPointF &gravity)
 void Box2DWorld::componentComplete()
 {
     QQuickItem::componentComplete();
-
-    const b2Vec2 gravity(mGravity.x(), mGravity.y());
-
-    mWorld = new b2World(gravity);
-    mWorld->SetContactListener(mContactListener);
-    mWorld->SetDestructionListener(mDestructionListener);
 
     if (mIsRunning)
         mTimer.start(mFrameTime, this);

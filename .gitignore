@@ -6,3 +6,4 @@ moc_*
 libBox2D.so
 
 box2d.pro.user
+/android

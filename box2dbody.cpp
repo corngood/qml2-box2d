@@ -174,6 +174,11 @@ void Box2DBody::setAngularVelocity(const qreal &angularVelocity)
     emit angularVelocityChanged();
 }
 
+qreal Box2DBody::mass() const
+{
+    return mBody ? (qreal)mBody->GetMass() : 0;
+}
+
 QQmlListProperty<Box2DFixture> Box2DBody::fixtures()
 {
     return QQmlListProperty<Box2DFixture>(this, 0, &Box2DBody::append_fixture, 0, 0, 0);

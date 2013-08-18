@@ -140,6 +140,11 @@ void Box2DJoint::cleanup()
     }
 }
 
+b2Joint *Box2DJoint::joint()
+{
+    return mJoint;
+}
+
 void Box2DJoint::bodyACreated()
 {
     mBodyA = static_cast<Box2DBody*>(sender());

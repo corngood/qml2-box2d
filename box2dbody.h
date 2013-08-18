@@ -59,6 +59,8 @@ class Box2DBody : public QQuickItem
     Q_PROPERTY(QPointF linearVelocity READ linearVelocity WRITE setLinearVelocity NOTIFY linearVelocityChanged)
     Q_PROPERTY(qreal angularVelocity READ angularVelocity WRITE setAngularVelocity NOTIFY angularVelocityChanged)
     Q_PROPERTY(QQmlListProperty<Box2DFixture> fixtures READ fixtures)
+    Q_PROPERTY(qreal angularDamping READ angularDamping WRITE setAngularDamping NOTIFY angularDampingChanged)
+    Q_PROPERTY(qreal mass READ mass)
 
 public:
     enum BodyType {
@@ -99,6 +101,8 @@ public:
 
     qreal angularVelocity() const { return mAngularVelocity; }
     void setAngularVelocity(const qreal &angularVelocity);
+
+    qreal mass() const;
 
     QQmlListProperty<Box2DFixture> fixtures();
 
